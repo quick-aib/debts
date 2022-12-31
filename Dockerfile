@@ -4,3 +4,4 @@ RUN apt update
 ADD ./app
 WORKDIR /app
 EXPOSE 5000
+CMD

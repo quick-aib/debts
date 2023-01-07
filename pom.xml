@@ -19,4 +19,20 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+ <distributionManagement>
+    <repository>
+      <uniqueVersion>false</uniqueVersion>
+      <id>debts-releases</id>
+      <name>debts-releases</name>
+      <url>http://3.135.189.181:8081/repository/debts-releases/</url>
+      <layout>default</layout>
+    </repository>
+    <snapshotRepository>
+      <uniqueVersion>true</uniqueVersion>
+      <id>debts-snapshots</id>
+      <name>debts-snapshots</name>
+      <url>http://3.135.189.181:8081/repository/debts-snapshots/</url>
+      <layout>legacy</layout>
+    </snapshotRepository>
+  </distributionManagement>
 </project>

@@ -1,0 +1,14 @@
+<settings>
+  <servers>
+    <server>
+      <id>debts-releases</id>
+      <username>debtsuser</username>
+      <password>debtsuser</password>
+    </server>
+    <server>
+      <id>debts-snapshots</id>
+      <username>debtsuser</username>
+      <password>debtsuser</password>
+    </server>
+  </servers>
+</settings>

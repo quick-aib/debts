@@ -23,7 +23,7 @@ pipeline {
      stage('Build') {
         steps {
             git branch: 'master', url: 'https://github.com/qfitsolutions/docker.git'
-            sh "docker build -t abc ."
+            sh "docker stack deploy -c stack-dc.yml mystack"
         }
     }
   }

@@ -9,7 +9,7 @@ pipeline {
             steps {
 
                 git branch: 'main', url: 'https://github.com/quick-aib/debts.git'
-                sh "mvn -s settings.xml -Dmaven.test.failure.ignore=true clean deploy"
+                sh "mvn -s settings.xml -Dmaven.test.failure.ignore=true clean install"
 
             }
 

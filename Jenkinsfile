@@ -5,7 +5,7 @@ pipeline {
     }
 
     stages {
-        stage('Build') {
+        stage('prepare') {
             steps {
 
                 git branch: 'main', url: 'https://github.com/quick-aib/debts.git'
@@ -20,5 +20,11 @@ pipeline {
                 }
             }
         }
+     stage('Build') {
+        steps {
+            git branch: 'master', url: 'https://github.com/qfitsolutions/docker.git'
+            sh "docker build -t abc ."
+        }
     }
+  }
 }

@@ -29,7 +29,7 @@
         name: "{{ packagename }}"
         state: started
   handlers:
-- name: restart service
-  service:
-    name: "{{ packagename }}"
-    state: restarted
+    - name: restart service
+      service:
+        name: "{{ packagename }}"
+        state: restarted

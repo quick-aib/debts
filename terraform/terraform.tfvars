@@ -1,1 +1,1 @@
-type=t2.small
+type="t2.small"

@@ -15,24 +15,24 @@ pipeline {
         }
         stage('terraform init') {
             steps {
-                
-               
-                // Run Maven on a Unix agent.
-                sh "terraform init"
-
-                
+               dir("terraform") {
+                  sh "terraform init"
+               }
             }
         }
         stage('terraform plan') {
             steps {
-                
-               sh "terraform plan -out terraform.plan"
+                dir("terraform") {
+                   sh "terraform plan -out terraform.plan"
+                }
 
             }
         }
         stage('terraform apply') {
             steps {
-                 sh "terraform apply terraform.plan"
+                dir("terraform") {
+                   sh "terraform apply terraform.plan"
+                }
             }
         }
     }

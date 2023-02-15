@@ -1,0 +1,32 @@
+pipeline{
+
+stages{
+  stage("prepare"){
+      echo "clone the git repo"
+  }
+  stage("build"){
+      echo "clone the git repo"
+  }
+  stage("upload"){
+      echo "clone the git repo"
+  }
+  stage("deploy-dev"){
+      echo "clone the git repo"
+  }
+  stage("deploy-stge"){
+      steps {
+                input('Do you want to proceed?')
+                echo "deploy into stge env"
+            }
+      
+  }
+  stage("deploy-prod"){
+       steps {
+                input('Do you want to proceed?')
+                echo "deploy into prod env"
+            }
+  }
+  
+}
+
+}

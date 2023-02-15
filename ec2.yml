@@ -1,0 +1,35 @@
+Parameters:
+  InstanceType:
+      Description: WebServer EC2 instance type
+      Type: String
+      Default: t3.small
+Resources:
+  EC2Instance: 
+    Type: AWS::EC2::Instance
+    Properties: 
+      ImageId: "ami-01a4f99c4ac11b03c"
+      KeyName: "mumbai"
+      InstanceType: !Ref 'InstanceType'
+      UserData:
+        Fn::Base64: 
+          !Sub |
+            #!/bin/bash
+            yum update -y
+            yum install -y httpd.x86_64
+            systemctl start httpd.service
+            systemctl enable httpd.service
+            echo ?Hello World from $(hostname -f)? > /var/www/html/index.html
+Outputs:
+  InstanceId:
+    Description: InstanceId of the newly created EC2 instance
+    Value: !Ref 'EC2Instance'
+  AZ:
+    Description: Availability Zone of the newly created EC2 instance
+    Value: !GetAtt [EC2Instance, AvailabilityZone]
+  PublicDNS:
+    Description: Public DNSName of the newly created EC2 instance
+    Value: !GetAtt [EC2Instance, PublicDnsName]
+  PublicIP:
+    Description: Public IP address of the newly created EC2 instance
+    Value: !GetAtt [EC2Instance, PublicIp]
+      

@@ -1,0 +1,35 @@
+---
+- hosts: "webserver"
+  vars:
+    packagename: nginx
+    portnumber: 82
+  tasks:
+    - name: install package
+      apt:
+        name: "{{ packagename }}"
+        state: latest
+    - name: Create a directory if it does not exist
+      file:
+        path: /var/www/tutorial
+        state: directory
+        mode: '0755'
+    - name: copy index file 
+      copy:
+        src: index.html
+        dest: /var/www/tutorial
+      notify: restart service
+    - name: copy tutorial file 
+      template:
+        src: tutorial.j2
+        dest: /etc/nginx/sites-enabled/tutorial
+      notify: restart service
+
+    - name: start service
+      service:
+        name: "{{ packagename }}"
+        state: started
+  handlers:
+- name: restart service
+  service:
+    name: "{{ packagename }}"
+    state: restarted

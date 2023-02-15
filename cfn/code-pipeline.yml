@@ -1,0 +1,126 @@
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+  GithubUserName:
+    Type: String
+    Default: <USERNAME>
+  GithubRepo:
+    Type: String
+    Default: Fargate-ECSCluster-Cloudformation
+  GithubBranch:
+    Type: String
+    Default: <BRANCH>
+  GithubOAuthToken:
+    Type: String
+    Default: <GITHUB ACCESS TOKEN>
+  ContainerPort:
+    Type: Number
+    Default: 8080
+ECRRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Join ['-', [!Ref Stage, !Ref 'AWS::AccountId', 'ecr-repository']]
+S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+        BucketName: !Join ['-', [!Ref Stage, !Ref 'AWS::AccountId', 's3bucket']]
+Resources:
+  BuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties: 
+        Artifacts: 
+        Type: CODEPIPELINE
+        Environment: 
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:2.0
+        ImagePullCredentialsType: CODEBUILD
+        PrivilegedMode: True
+        Type: LINUX_CONTAINER
+        EnvironmentVariables:
+            - Name: ECR_REPOSITORY_URI
+              Value: !Join [ ".", [ !Ref "AWS::AccountId", "dkr.ecr", !Ref "AWS::Region", !Join [ "/", [ "amazonaws.com", !Ref "ECRRepository" ] ] ] ]
+        Name: !Join ['-', [!Ref Stage, !Ref 'AWS::AccountId', 'BuildProject']]
+        ServiceRole: !Ref CodeBuildExecutionRole
+        Source:
+            Type: CODEPIPELINE
+            BuildSpec: buildspec.yml
+    CodeBuildExecutionRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+            Statement:
+            Effect: Allow
+            Principal:
+                Service: codebuild.amazonaws.com
+            Action: sts:AssumeRole
+        ManagedPolicyArns:
+            - arn:aws:iam::aws:policy/AdministratorAccess
+    CodePipeLine:
+      Type: AWS::CodePipeline::Pipeline
+      Properties: 
+        ArtifactStore: 
+        Location: !Join ['-', [!Ref Stage, !Ref 'AWS::AccountId', 's3bucket']]
+        Type: S3
+        Name: !Join ['-', [!Ref Stage, !Ref 'AWS::AccountId', 'CodePipeLine']]
+        RestartExecutionOnUpdate: False
+        RoleArn: 
+        Fn::GetAtt: [ CodePipeLineExecutionRole, Arn ]
+    - Name: Source
+      Actions: 
+        - Name: Source
+            ActionTypeId: 
+            Category: Source
+            Owner: ThirdParty
+            Provider: GitHub
+            Version: 1
+            Configuration:
+            Repo: !Ref GithubRepo
+            Branch: !Ref GithubBranch
+            Owner: !Ref GithubUserName
+            OAuthToken: !Ref GithubOAuthToken
+            Region: !Ref Region
+            RunOrder: 1
+            OutputArtifacts:
+            - Name: source-output-artifacts
+    - Name: Build
+      Actions:
+        - Name: Build
+            ActionTypeId:
+            Category: Build
+            Owner: AWS
+            Version: 1
+            Provider: CodeBuild
+            OutputArtifacts:
+            - Name: build-output-artifacts
+            InputArtifacts:
+            - Name: source-output-artifacts
+            Configuration:
+                ProjectName: !Ref BuildProject
+            RunOrder: 1
+    # - Name: Deploy
+    #   Actions:
+    #     - Name: Deploy
+    #         ActionTypeId:
+    #         Category: Deploy
+    #         Owner: AWS
+    #         Version: 1
+    #         Provider: CloudFormation
+    #         InputArtifacts:
+    #         - Name: source-output-artifacts
+    #         - Name: build-output-artifacts
+    #         Configuration:
+    #             ActionMode: CREATE_UPDATE
+    #             Capabilities: CAPABILITY_NAMED_IAM
+    #             # Pass parameter values to Fargate-Cluster.yml for deployment
+    #             ParameterOverrides: !Sub |
+    #             {
+    #                 "ImageURI" : { "Fn::GetParam" : ["build-output-artifacts", "imageDetail.json", "ImageURI"] },
+    #                 "Stage":  "${Stage}",
+    #                 "ContainerPort": "${ContainerPort}"
+    #             }
+    #             RoleArn: 
+    #             Fn::GetAtt: [ CloudformationExecutionRole, Arn ]
+    #             StackName: !Join ['-', [!Ref Stage, !Ref 'AWS::AccountId', 'FargateECSCluster']]
+    #             TemplatePath: source-output-artifacts::Cloudformation/Fargate-Cluster.yml
+    #         RunOrder: 1

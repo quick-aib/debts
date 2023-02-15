@@ -1,0 +1,12 @@
+#ansible -i inventory all -m copy -a "src=a.txt dest=/root/abc/a.txt"
+---
+- hosts: webservers
+  tasks:
+    - name: copy file
+      copy:
+        src: a.txt
+        dest: /root/abc/a.txt
+- hosts: localservers
+  tasks:
+    - name: ping
+      ping:

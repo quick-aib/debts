@@ -1,0 +1,102 @@
+#kubectl run n1 --image=nginx --port=80
+#kubectl expose pod n1 --port=80 --target-port=80 --name=n1s --type=NodePort
+apiVersion: v1
+kind: Pod
+metadata:
+  name: n1
+  labels:
+    app: nginx
+    env: dev
+spec:
+  containers:
+  - name: nginx
+    image: nginx:latest
+    ports:
+      - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: n1s
+spec:
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: NodePort
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: n1r
+  labels:
+    app: nginx
+    env: dev
+spec:
+  replica: 3
+  selector:
+    app: nginx
+  template:
+    metadata:
+      name: n1
+      labels:
+        app: nginx
+        env: dev
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+          - containerPort: 80
+---
+apiVersion: v1
+kind: ReplicaSet
+metadata:
+  name: n1r
+  labels:
+    app: nginx
+    env: dev
+spec:
+  replica: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      name: n1
+      labels:
+        app: nginx
+        env: dev
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+          - containerPort: 80
+---
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: n1r
+  labels:
+    app: nginx
+    env: dev
+spec:
+  replica: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      name: n1
+      labels:
+        app: nginx
+        env: dev
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+          - containerPort: 80

@@ -1,0 +1,44 @@
+Name:
+elasticcloud
+
+
+Application ID:
+4601dce9-70bc-43f9-8359-5ebb2bb6e4f1
+
+
+Object ID:
+26581c60-48e1-49e8-91cf-1388cd7d6ded
+
+
+
+
+xpack.security.authc.realms.saml.kibana-realm:
+            order: 2
+            attributes.principal: nameid
+            attributes.groups: "http://schemas.microsoft.com/ws/2008/06/identity/claims/groups"
+            idp.metadata.path: "https://login.microsoftonline.com/e80326a2-653b-4be1-9c42-fa8aa110e0f6/federationmetadata/2007-06/federationmetadata.xml?appid=4601dce9-70bc-43f9-8359-5ebb2bb6e4f1"
+            idp.entity_id: "https://sts.windows.net/e80326a2-653b-4be1-9c42-fa8aa110e0f6/"
+            sp.entity_id: "https://devo-logs.kb.us-east-2.aws.elastic-cloud.com:9243"
+            sp.acs: "https://devo-logs.kb.us-east-2.aws.elastic-cloud.com:9243/api/security/saml/callback"
+            sp.logout: "https://devo-logs.kb.us-east-2.aws.elastic-cloud.com:9243/logout"
+
+
+
+
+xpack.security.authc.providers:
+  saml.kibana-realm:
+    order: 0
+    realm: kibana-realm
+    description: "Log in with Azure AD"
+
+
+
+PUT /_security/role_mapping/saml-example
+{
+  "roles": [ "superuser" ], 
+  "enabled": true,
+  "rules": {
+    "field": { "realm.name": "kibana-realm" }
+  }
+}
+

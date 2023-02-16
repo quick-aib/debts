@@ -1,9 +1,8 @@
-
-resource "aws_instance" "app_server" {
-  ami           = "ami-830c94e3"
-  instance_type = var.type
-
-  tags = {
-    Name = "test"
-  }
+module "servers" {
+  source = "./ec2"
+  type ="t2.micro"
+}
+module "servnetworksers" {
+  source = "./vpc"
+  type ="t2.micro"
 }

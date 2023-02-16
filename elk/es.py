@@ -16,13 +16,17 @@ client = Elasticsearch(
 # Successful response!
 client.info()
 # {'name': 'instance-0000000000', 'cluster_name': ...}
-print(client.info())
+#print(client.info())
 
 doc = {
     'author': 'author_name',
     'text': 'Interensting content...',
     'timestamp': datetime.now(),
 }
-for i in range(1,10):
-  resp = client.index(index="test-index", id=i, document=doc)
-  print(resp['result'])
+# for i in range(1,10):
+#   resp = client.index(index="test-index", id=i, document=doc)
+#   print(resp['result'])
+
+#resp = client.search(index="test-index", query={"match_all": {}})
+resp = client.search(index="test-index", query={"term": {"author": {"value": "ravi"}}})
+print(resp)
